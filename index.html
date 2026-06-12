@@ -3,7 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MediStock — Pharmacy Inventory</title>
+<title>MediStock</title>
+
+<!-- PWA MANIFEST -->
+<meta name="application-name" content="MediStock">
+<meta name="apple-mobile-web-app-title" content="MediStock">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a2332">
+<meta name="description" content="Smart pharmacy inventory and sales tracker for medical stores.">
+<link rel="manifest" href="manifest.json">
+
+<!-- ICONS (inline fallback) -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a2332'/><text y='.9em' font-size='80' x='10'>💊</text></svg>">
+
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
   :root {
@@ -64,7 +78,6 @@
   .empty{text-align:center;padding:48px 24px;color:var(--text3)}
   .empty-icon{font-size:40px;margin-bottom:12px}
   .empty h3{font-size:16px;color:var(--text2);margin-bottom:6px}
-  /* MODAL */
   .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
   .overlay.open{display:flex}
   .modal{background:var(--surface);border-radius:14px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -81,14 +94,12 @@
   .profit-preview .pp-val{font-weight:600}
   .profit-preview .pp-val.pos{color:var(--green)}
   .profit-preview .pp-val.neg{color:var(--red)}
-  /* SELL MODAL specifics */
   .sell-info{background:var(--surface2);border-radius:10px;padding:14px 16px;margin-bottom:18px}
   .sell-info-name{font-weight:700;font-size:15px;margin-bottom:6px}
   .sell-info-row{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--text2)}
   .sell-info-row span b{color:var(--text)}
   .sell-preview{background:var(--purple-light);border:1px solid #ddd6fe;border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:13px;color:var(--purple);margin-top:4px}
   .sell-preview b{font-weight:700}
-  /* SALES LOG */
   .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
   .tab{padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
   .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
@@ -99,10 +110,20 @@
   .log-name{font-weight:600;color:var(--text)}
   .log-meta{font-size:11px;color:var(--text3);margin-top:2px}
   .log-profit{font-family:var(--mono);font-weight:700;color:var(--purple)}
+  /* Install banner */
+  .install-banner{background:#1a2332;color:#fff;padding:12px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
+  .install-banner.show{display:flex}
+  .install-banner button{background:#4ade80;color:#1a2332;border:none;padding:7px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
   @media(max-width:500px){.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:1}.stats{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
+
+<!-- INSTALL BANNER -->
+<div class="install-banner" id="installBanner">
+  <span>📲 Install MediStock as an app</span>
+  <button onclick="installApp()">Install</button>
+</div>
 
 <header>
   <div class="logo">Medi<span>Stock</span></div>
@@ -113,23 +134,18 @@
 </header>
 
 <main>
-  <div class="stats" id="statsRow">
+  <div class="stats">
     <div class="stat-card"><div class="stat-label">Total Products</div><div class="stat-value" id="statTotal">0</div></div>
     <div class="stat-card"><div class="stat-label">Stock Value</div><div class="stat-value green" id="statValue">₹0</div></div>
     <div class="stat-card"><div class="stat-label">Expected Profit</div><div class="stat-value green" id="statProfit">₹0</div></div>
     <div class="stat-card"><div class="stat-label">Total Earned</div><div class="stat-value purple" id="statEarned">₹0</div></div>
     <div class="stat-card"><div class="stat-label">Low Stock</div><div class="stat-value amber" id="statLow">0</div></div>
   </div>
-
   <div class="alert-banner" id="alertBanner"><span>⚠️</span><span id="alertText"></span></div>
-
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('inventory')">📦 Inventory</button>
     <button class="tab" onclick="switchTab('sales')">💰 Sales Log</button>
   </div>
-
-  <!-- INVENTORY TAB -->
   <div class="tab-panel active" id="tab-inventory">
     <div class="toolbar">
       <input type="text" id="searchBox" placeholder="🔍 Search medicine, category..." oninput="renderTable()">
@@ -148,18 +164,16 @@
     </div>
     <div class="table-wrap">
       <table>
-        <thead>
-          <tr>
-            <th onclick="sortBy('name')">Medicine ↕</th>
-            <th onclick="sortBy('category')">Category ↕</th>
-            <th onclick="sortBy('qty')">Qty ↕</th>
-            <th onclick="sortBy('purchase')">Purchase ↕</th>
-            <th onclick="sortBy('selling')">Selling ↕</th>
-            <th onclick="sortBy('profit')">Profit/Unit ↕</th>
-            <th>Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
+        <thead><tr>
+          <th onclick="sortBy('name')">Medicine ↕</th>
+          <th onclick="sortBy('category')">Category ↕</th>
+          <th onclick="sortBy('qty')">Qty ↕</th>
+          <th onclick="sortBy('purchase')">Purchase ↕</th>
+          <th onclick="sortBy('selling')">Selling ↕</th>
+          <th onclick="sortBy('profit')">Profit/Unit ↕</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr></thead>
         <tbody id="tableBody"></tbody>
       </table>
       <div class="empty" id="emptyState" style="display:none">
@@ -169,8 +183,6 @@
       </div>
     </div>
   </div>
-
-  <!-- SALES LOG TAB -->
   <div class="tab-panel" id="tab-sales">
     <div class="section-top">
       <div class="section-title">Sales History</div>
@@ -231,142 +243,164 @@
 </div>
 
 <script>
-  let inventory = JSON.parse(localStorage.getItem('medistock_v1') || '[]');
-  let salesLog   = JSON.parse(localStorage.getItem('medistock_sales') || '[]');
-  let editingId  = null;
-  let sellingId  = null;
-  let sortKey = 'name', sortAsc = true;
+  // ── DATA ──────────────────────────────────────────────────────────────────
+  let inventory = JSON.parse(localStorage.getItem('medistock_v1')||'[]');
+  let salesLog   = JSON.parse(localStorage.getItem('medistock_sales')||'[]');
+  let editingId=null, sellingId=null, sortKey='name', sortAsc=true;
 
-  function save() {
-    localStorage.setItem('medistock_v1', JSON.stringify(inventory));
-    localStorage.setItem('medistock_sales', JSON.stringify(salesLog));
+  function save(){
+    localStorage.setItem('medistock_v1',JSON.stringify(inventory));
+    localStorage.setItem('medistock_sales',JSON.stringify(salesLog));
   }
-  function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+  function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+
+  // ── PWA INSTALL ───────────────────────────────────────────────────────────
+  let deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt',e=>{
+    e.preventDefault(); deferredPrompt=e;
+    document.getElementById('installBanner').classList.add('show');
+  });
+  function installApp(){
+    if(!deferredPrompt)return;
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{
+      deferredPrompt=null;
+      document.getElementById('installBanner').classList.remove('show');
+    });
+  }
+  window.addEventListener('appinstalled',()=>{
+    document.getElementById('installBanner').classList.remove('show');
+  });
+
+  // ── SERVICE WORKER ────────────────────────────────────────────────────────
+  if('serviceWorker' in navigator){
+    const swCode=`
+      const CACHE='medistock-v1';
+      const FILES=['./','/index.html'];
+      self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
+      self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
+    `;
+    const blob=new Blob([swCode],{type:'application/javascript'});
+    const swUrl=URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl).catch(()=>{});
+  }
 
   // ── TABS ──────────────────────────────────────────────────────────────────
-  function switchTab(name) {
-    document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', ['inventory','sales'][i]===name));
-    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  function switchTab(name){
+    document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['inventory','sales'][i]===name));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     document.getElementById('tab-'+name).classList.add('active');
-    if (name==='sales') renderSalesLog();
+    if(name==='sales') renderSalesLog();
   }
 
   // ── ADD/EDIT MODAL ────────────────────────────────────────────────────────
-  function openAddModal(id=null) {
-    editingId = id;
-    document.getElementById('modalTitle').textContent = id ? 'Edit Medicine' : 'Add Medicine';
-    document.getElementById('saveBtn').textContent    = id ? 'Update Medicine' : 'Save Medicine';
-    if (id) {
-      const it = inventory.find(i=>i.id===id);
-      document.getElementById('fName').value     = it.name;
-      document.getElementById('fCategory').value = it.category||'';
-      document.getElementById('fQty').value      = it.qty;
-      document.getElementById('fPurchase').value = it.purchase;
-      document.getElementById('fSelling').value  = it.selling;
-      document.getElementById('fLowAlert').value = it.lowAlert||10;
-      document.getElementById('fExpiry').value   = it.expiry||'';
-      document.getElementById('fNotes').value    = it.notes||'';
+  function openAddModal(id=null){
+    editingId=id;
+    document.getElementById('modalTitle').textContent=id?'Edit Medicine':'Add Medicine';
+    document.getElementById('saveBtn').textContent=id?'Update Medicine':'Save Medicine';
+    if(id){
+      const it=inventory.find(i=>i.id===id);
+      document.getElementById('fName').value=it.name;
+      document.getElementById('fCategory').value=it.category||'';
+      document.getElementById('fQty').value=it.qty;
+      document.getElementById('fPurchase').value=it.purchase;
+      document.getElementById('fSelling').value=it.selling;
+      document.getElementById('fLowAlert').value=it.lowAlert||10;
+      document.getElementById('fExpiry').value=it.expiry||'';
+      document.getElementById('fNotes').value=it.notes||'';
     } else {
       ['fName','fCategory','fQty','fPurchase','fSelling','fExpiry','fNotes'].forEach(x=>document.getElementById(x).value='');
-      document.getElementById('fLowAlert').value = 10;
+      document.getElementById('fLowAlert').value=10;
     }
     updateProfitPreview();
     document.getElementById('overlayAdd').classList.add('open');
     document.getElementById('fName').focus();
   }
 
-  function updateProfitPreview() {
-    const p = parseFloat(document.getElementById('fPurchase').value)||0;
-    const s = parseFloat(document.getElementById('fSelling').value)||0;
-    const profit = s-p, margin = p>0?((profit/p)*100).toFixed(1):'--';
-    const el = document.getElementById('profitPreview');
-    if (!p&&!s){el.textContent='Enter purchase & selling price to see profit';return;}
-    const c = profit>=0?'pos':'neg';
+  function updateProfitPreview(){
+    const p=parseFloat(document.getElementById('fPurchase').value)||0;
+    const s=parseFloat(document.getElementById('fSelling').value)||0;
+    const profit=s-p,margin=p>0?((profit/p)*100).toFixed(1):'--';
+    const el=document.getElementById('profitPreview');
+    if(!p&&!s){el.textContent='Enter purchase & selling price to see profit';return;}
+    const c=profit>=0?'pos':'neg';
     el.innerHTML=`Profit/unit: <span class="pp-val ${c}">₹${profit.toFixed(2)}</span> &nbsp;|&nbsp; Margin: <span class="pp-val ${c}">${margin}%</span>`;
   }
 
-  function saveItem() {
-    const name = document.getElementById('fName').value.trim();
-    if (!name){alert('Medicine name is required.');return;}
-    const item = {
-      id: editingId||genId(), name,
-      category: document.getElementById('fCategory').value.trim(),
-      qty: parseInt(document.getElementById('fQty').value)||0,
-      purchase: parseFloat(document.getElementById('fPurchase').value)||0,
-      selling:  parseFloat(document.getElementById('fSelling').value)||0,
-      lowAlert: parseInt(document.getElementById('fLowAlert').value)||10,
-      expiry:   document.getElementById('fExpiry').value.trim(),
-      notes:    document.getElementById('fNotes').value.trim(),
+  function saveItem(){
+    const name=document.getElementById('fName').value.trim();
+    if(!name){alert('Medicine name is required.');return;}
+    const item={
+      id:editingId||genId(),name,
+      category:document.getElementById('fCategory').value.trim(),
+      qty:parseInt(document.getElementById('fQty').value)||0,
+      purchase:parseFloat(document.getElementById('fPurchase').value)||0,
+      selling:parseFloat(document.getElementById('fSelling').value)||0,
+      lowAlert:parseInt(document.getElementById('fLowAlert').value)||10,
+      expiry:document.getElementById('fExpiry').value.trim(),
+      notes:document.getElementById('fNotes').value.trim(),
     };
-    if (editingId) { const idx=inventory.findIndex(i=>i.id===editingId); inventory[idx]=item; }
+    if(editingId){const idx=inventory.findIndex(i=>i.id===editingId);inventory[idx]=item;}
     else inventory.push(item);
-    save(); closeModal('overlayAdd'); renderAll();
+    save();closeModal('overlayAdd');renderAll();
   }
 
-  function deleteItem(id) {
-    const it = inventory.find(i=>i.id===id);
-    if (!confirm(`Delete "${it.name}"?`)) return;
-    inventory = inventory.filter(i=>i.id!==id);
-    save(); renderAll();
+  function deleteItem(id){
+    const it=inventory.find(i=>i.id===id);
+    if(!confirm(`Delete "${it.name}"?`))return;
+    inventory=inventory.filter(i=>i.id!==id);
+    save();renderAll();
   }
 
   // ── SELL MODAL ────────────────────────────────────────────────────────────
-  function openSellModal(id) {
-    sellingId = id;
-    const it = inventory.find(i=>i.id===id);
-    const profit = it.selling - it.purchase;
-    document.getElementById('sellInfo').innerHTML = `
+  function openSellModal(id){
+    sellingId=id;
+    const it=inventory.find(i=>i.id===id);
+    const profit=it.selling-it.purchase;
+    document.getElementById('sellInfo').innerHTML=`
       <div class="sell-info-name">💊 ${it.name}</div>
       <div class="sell-info-row">
         <span>Stock: <b>${it.qty} units</b></span>
         <span>Selling: <b>₹${it.selling.toFixed(2)}</b></span>
         <span>Profit/unit: <b style="color:var(--purple)">₹${profit.toFixed(2)}</b></span>
       </div>`;
-    document.getElementById('sQty').value = '';
-    document.getElementById('sellPreview').innerHTML = 'Enter quantity to see sale summary';
+    document.getElementById('sQty').value='';
+    document.getElementById('sellPreview').innerHTML='Enter quantity to see sale summary';
     document.getElementById('overlaySell').classList.add('open');
     document.getElementById('sQty').focus();
   }
 
-  function updateSellPreview() {
-    const it  = inventory.find(i=>i.id===sellingId);
-    const qty = parseInt(document.getElementById('sQty').value)||0;
-    const el  = document.getElementById('sellPreview');
-    if (!qty){el.innerHTML='Enter quantity to see sale summary';return;}
-    if (qty > it.qty){
-      el.innerHTML=`<span style="color:var(--red)">⚠ Only ${it.qty} units in stock!</span>`;return;
-    }
-    const revenue = qty * it.selling;
-    const profit  = qty * (it.selling - it.purchase);
+  function updateSellPreview(){
+    const it=inventory.find(i=>i.id===sellingId);
+    const qty=parseInt(document.getElementById('sQty').value)||0;
+    const el=document.getElementById('sellPreview');
+    if(!qty){el.innerHTML='Enter quantity to see sale summary';return;}
+    if(qty>it.qty){el.innerHTML=`<span style="color:var(--red)">⚠ Only ${it.qty} units in stock!</span>`;return;}
+    const revenue=qty*it.selling,profit=qty*(it.selling-it.purchase);
     el.innerHTML=`Sell <b>${qty}</b> units → Revenue: <b>₹${revenue.toFixed(2)}</b> · Profit: <b>₹${profit.toFixed(2)}</b>`;
   }
 
-  function confirmSale() {
-    const it  = inventory.find(i=>i.id===sellingId);
-    const qty = parseInt(document.getElementById('sQty').value)||0;
-    if (!qty){alert('Enter quantity sold.');return;}
-    if (qty > it.qty){alert(`Only ${it.qty} units available.`);return;}
-    const revenue = qty * it.selling;
-    const profit  = qty * (it.selling - it.purchase);
-    // update stock
-    it.qty -= qty;
-    // log sale
+  function confirmSale(){
+    const it=inventory.find(i=>i.id===sellingId);
+    const qty=parseInt(document.getElementById('sQty').value)||0;
+    if(!qty){alert('Enter quantity sold.');return;}
+    if(qty>it.qty){alert(`Only ${it.qty} units available.`);return;}
+    const revenue=qty*it.selling,profit=qty*(it.selling-it.purchase);
+    it.qty-=qty;
     salesLog.unshift({
-      id: genId(), medicineId: it.id, name: it.name,
-      qty, revenue, profit,
-      sellingPrice: it.selling, purchasePrice: it.purchase,
-      date: new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      id:genId(),medicineId:it.id,name:it.name,qty,revenue,profit,
+      sellingPrice:it.selling,purchasePrice:it.purchase,
+      date:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
     });
-    save(); closeModal('overlaySell'); renderAll();
+    save();closeModal('overlaySell');renderAll();
   }
 
   // ── SALES LOG ─────────────────────────────────────────────────────────────
-  function renderSalesLog() {
-    const el = document.getElementById('salesLog');
-    const em = document.getElementById('salesEmpty');
-    if (!salesLog.length){el.innerHTML='';em.style.display='block';return;}
+  function renderSalesLog(){
+    const el=document.getElementById('salesLog'),em=document.getElementById('salesEmpty');
+    if(!salesLog.length){el.innerHTML='';em.style.display='block';return;}
     em.style.display='none';
-    el.innerHTML = salesLog.map(s=>`
+    el.innerHTML=salesLog.map(s=>`
       <div class="log-item">
         <div>
           <div class="log-name">💊 ${s.name}</div>
@@ -379,30 +413,27 @@
       </div>`).join('');
   }
 
-  function clearSales() {
-    if (!salesLog.length) return;
-    if (!confirm('Clear all sales history?')) return;
-    salesLog = []; save(); renderSalesLog();
+  function clearSales(){
+    if(!salesLog.length)return;
+    if(!confirm('Clear all sales history?'))return;
+    salesLog=[];save();renderSalesLog();
   }
 
   // ── MODALS UTILS ──────────────────────────────────────────────────────────
-  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-  function handleOverlayClick(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
+  function closeModal(id){document.getElementById(id).classList.remove('open');}
+  function handleOverlayClick(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 
   // ── TABLE ─────────────────────────────────────────────────────────────────
-  function sortBy(key){ if(sortKey===key) sortAsc=!sortAsc; else{sortKey=key;sortAsc=true;} renderTable(); }
+  function sortBy(key){if(sortKey===key)sortAsc=!sortAsc;else{sortKey=key;sortAsc=true;}renderTable();}
 
-  function getFiltered() {
-    const q = document.getElementById('searchBox').value.toLowerCase();
-    const cat = document.getElementById('filterCat').value;
-    const stock = document.getElementById('filterStock').value;
+  function getFiltered(){
+    const q=document.getElementById('searchBox').value.toLowerCase();
+    const cat=document.getElementById('filterCat').value;
+    const stock=document.getElementById('filterStock').value;
     return inventory.filter(it=>{
-      const mq = !q || it.name.toLowerCase().includes(q)||(it.category||'').toLowerCase().includes(q);
-      const mc = !cat || it.category===cat;
-      const ms = !stock ||
-        (stock==='low'&&it.qty>0&&it.qty<=(it.lowAlert||10))||
-        (stock==='out'&&it.qty===0)||
-        (stock==='ok'&&it.qty>(it.lowAlert||10));
+      const mq=!q||it.name.toLowerCase().includes(q)||(it.category||'').toLowerCase().includes(q);
+      const mc=!cat||it.category===cat;
+      const ms=!stock||(stock==='low'&&it.qty>0&&it.qty<=(it.lowAlert||10))||(stock==='out'&&it.qty===0)||(stock==='ok'&&it.qty>(it.lowAlert||10));
       return mq&&mc&&ms;
     }).sort((a,b)=>{
       let va,vb;
@@ -412,28 +443,26 @@
       else if(sortKey==='purchase'){va=a.purchase;vb=b.purchase;}
       else if(sortKey==='selling'){va=a.selling;vb=b.selling;}
       else if(sortKey==='profit'){va=a.selling-a.purchase;vb=b.selling-b.purchase;}
-      return (va<vb?-1:va>vb?1:0)*(sortAsc?1:-1);
+      return(va<vb?-1:va>vb?1:0)*(sortAsc?1:-1);
     });
   }
 
   function stockStatus(it){
-    if(it.qty===0) return['Out of Stock','pill-red'];
-    if(it.qty<=(it.lowAlert||10)) return['Low Stock','pill-amber'];
+    if(it.qty===0)return['Out of Stock','pill-red'];
+    if(it.qty<=(it.lowAlert||10))return['Low Stock','pill-amber'];
     return['In Stock','pill-green'];
   }
 
-  function renderTable() {
-    const filtered = getFiltered();
-    const tbody = document.getElementById('tableBody');
-    const empty = document.getElementById('emptyState');
+  function renderTable(){
+    const filtered=getFiltered();
+    const tbody=document.getElementById('tableBody'),empty=document.getElementById('emptyState');
     document.getElementById('itemCount').textContent=`${filtered.length} item${filtered.length!==1?'s':''}`;
     if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return;}
     empty.style.display='none';
-    tbody.innerHTML = filtered.map(it=>{
-      const profit = it.selling-it.purchase;
-      const pc = profit>=0?'profit-pos':'profit-neg';
-      const [st,sc] = stockStatus(it);
-      return `<tr>
+    tbody.innerHTML=filtered.map(it=>{
+      const profit=it.selling-it.purchase,pc=profit>=0?'profit-pos':'profit-neg';
+      const[st,sc]=stockStatus(it);
+      return`<tr>
         <td>
           <div style="font-weight:600;color:var(--text)">${it.name}</div>
           ${it.expiry?`<div style="font-size:11px;color:var(--text3)">Exp: ${it.expiry}</div>`:''}
@@ -446,7 +475,7 @@
         <td class="${pc}">₹${profit.toFixed(2)}</td>
         <td><span class="pill ${sc}">${st}</span></td>
         <td style="white-space:nowrap">
-          <button class="btn btn-purple btn-icon" onclick="openSellModal('${it.id}')" title="Record Sale">💊 Sell</button>
+          <button class="btn btn-purple btn-icon" onclick="openSellModal('${it.id}')" title="Sell">💊 Sell</button>
           <button class="btn btn-ghost btn-icon" onclick="openAddModal('${it.id}')" title="Edit" style="margin-left:4px">✏️</button>
           <button class="btn btn-ghost btn-icon" onclick="deleteItem('${it.id}')" title="Delete" style="margin-left:4px">🗑️</button>
         </td>
@@ -454,58 +483,75 @@
     }).join('');
   }
 
-  // ── STATS ─────────────────────────────────────────────────────────────────
-  function renderStats() {
-    const totalValue  = inventory.reduce((s,i)=>s+i.purchase*i.qty,0);
-    const totalProfit = inventory.reduce((s,i)=>s+(i.selling-i.purchase)*i.qty,0);
-    const totalEarned = salesLog.reduce((s,l)=>s+l.profit,0);
-    const low = inventory.filter(i=>i.qty>0&&i.qty<=(i.lowAlert||10)).length;
-    const out = inventory.filter(i=>i.qty===0).length;
-    document.getElementById('statTotal').textContent  = inventory.length;
-    document.getElementById('statValue').textContent  = '₹'+totalValue.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById('statProfit').textContent = '₹'+totalProfit.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById('statProfit').className   = 'stat-value '+(totalProfit>=0?'green':'red');
-    document.getElementById('statEarned').textContent = '₹'+totalEarned.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById('statLow').textContent    = low+out;
-    const banner = document.getElementById('alertBanner');
-    const badge  = document.getElementById('lowBadge');
-    const parts  = [];
-    if(out)  parts.push(`${out} out of stock`);
-    if(low)  parts.push(`${low} running low`);
+  function renderStats(){
+    const totalValue=inventory.reduce((s,i)=>s+i.purchase*i.qty,0);
+    const totalProfit=inventory.reduce((s,i)=>s+(i.selling-i.purchase)*i.qty,0);
+    const totalEarned=salesLog.reduce((s,l)=>s+l.profit,0);
+    const low=inventory.filter(i=>i.qty>0&&i.qty<=(i.lowAlert||10)).length;
+    const out=inventory.filter(i=>i.qty===0).length;
+    document.getElementById('statTotal').textContent=inventory.length;
+    document.getElementById('statValue').textContent='₹'+totalValue.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statProfit').textContent='₹'+totalProfit.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statProfit').className='stat-value '+(totalProfit>=0?'green':'red');
+    document.getElementById('statEarned').textContent='₹'+totalEarned.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statLow').textContent=low+out;
+    const banner=document.getElementById('alertBanner'),badge=document.getElementById('lowBadge');
+    const parts=[];
+    if(out)parts.push(`${out} out of stock`);
+    if(low)parts.push(`${low} running low`);
     if(parts.length){document.getElementById('alertText').textContent=parts.join(' · ')+'. Restock soon.';banner.classList.add('show');badge.style.display='inline';}
     else{banner.classList.remove('show');badge.style.display='none';}
   }
 
-  function renderCategories() {
+  function renderCategories(){
     const cats=[...new Set(inventory.map(i=>i.category).filter(Boolean))].sort();
     const sel=document.getElementById('filterCat'),cur=sel.value;
     sel.innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');
     document.getElementById('catList').innerHTML=cats.map(c=>`<option value="${c}">`).join('');
   }
 
-  function renderAll(){ renderStats(); renderCategories(); renderTable(); }
+  function renderAll(){renderStats();renderCategories();renderTable();}
 
-  // ── EXPORT ────────────────────────────────────────────────────────────────
-  function exportCSV() {
+  function exportCSV(){
     const h=['Name','Category','Qty','Purchase','Selling','Profit/Unit','Status','Expiry'];
     const rows=inventory.map(i=>{const[s]=stockStatus(i);return[i.name,i.category||'',i.qty,i.purchase,i.selling,(i.selling-i.purchase).toFixed(2),s,i.expiry||''];});
     const csv=[h,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
     const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='medistock.csv';a.click();
   }
 
-  // ── SEED ──────────────────────────────────────────────────────────────────
-  if(!inventory.length){
-    inventory=[
-      {id:genId(),name:'Paracetamol 500mg',category:'Analgesic',qty:120,purchase:1.50,selling:2.50,lowAlert:20,expiry:'Mar 2027',notes:''},
-      {id:genId(),name:'Amoxicillin 250mg',category:'Antibiotic',qty:8,purchase:6.00,selling:10.00,lowAlert:15,expiry:'Jan 2027',notes:''},
-      {id:genId(),name:'ORS Sachet',category:'OTC',qty:0,purchase:3.00,selling:5.00,lowAlert:10,expiry:'Dec 2026',notes:'Reorder pending'},
-      {id:genId(),name:'Cetrizine 10mg',category:'Antihistamine',qty:60,purchase:2.00,selling:3.50,lowAlert:10,expiry:'Jun 2027',notes:''},
-    ];
-    save();
-  }
+  // ── FIRST LAUNCH CHECK (no seed data) ────────────────────────────────────
+  // Only show empty state on first ever load, never auto-fill demo data
 
   renderAll();
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('overlayAdd');closeModal('overlaySell');}});
+</script>
+
+<!-- INLINE MANIFEST for PWABuilder -->
+<script>
+  // Inject manifest dynamically so it works from a single HTML file
+  const manifest = {
+    name: "MediStock",
+    short_name: "MediStock",
+    description: "Smart pharmacy inventory and sales tracker",
+    start_url: "./",
+    display: "standalone",
+    background_color: "#f0f4f8",
+    theme_color: "#1a2332",
+    orientation: "portrait",
+    icons: [
+      {
+        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231a2332'/><text y='380' x='60' font-size='380'>💊</text></svg>",
+        sizes: "512x512",
+        type: "image/svg+xml",
+        purpose: "any maskable"
+      }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  const url  = URL.createObjectURL(blob);
+  const link = document.createElement('link');
+  link.rel='manifest'; link.href=url;
+  document.head.appendChild(link);
 </script>
 </body>
 </html>
