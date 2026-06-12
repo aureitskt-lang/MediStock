@@ -4,20 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MediStock</title>
-
-<!-- PWA MANIFEST -->
 <meta name="application-name" content="MediStock">
 <meta name="apple-mobile-web-app-title" content="MediStock">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1a2332">
 <meta name="description" content="Smart pharmacy inventory and sales tracker for medical stores.">
-<link rel="manifest" href="manifest.json">
-
-<!-- ICONS (inline fallback) -->
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%231a2332'/><text y='.9em' font-size='80' x='10'>💊</text></svg>">
-
 <style>
   @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
   :root {
@@ -26,7 +18,7 @@
     --green:#0d6e4f;--green-light:#e6f4ef;
     --red:#c0392b;--red-light:#fdf0ee;
     --amber:#b45309;--amber-light:#fef3c7;
-    --blue:#1d4ed8;--blue-light:#eff6ff;
+    --blue:#1d4ed8;
     --purple:#6d28d9;--purple-light:#f5f3ff;
     --mono:'IBM Plex Mono',monospace;--sans:'Inter',sans-serif;
   }
@@ -38,7 +30,7 @@
   .header-right{display:flex;align-items:center;gap:10px}
   .badge-low{background:#c0392b;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;display:none}
   main{max-width:1150px;margin:0 auto;padding:24px 16px}
-  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:20px}
   .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
   .stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px}
   .stat-value{font-family:var(--mono);font-size:22px;font-weight:600}
@@ -47,13 +39,12 @@
   .alert-banner.show{display:flex}
   .toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
   .toolbar input[type="text"]{flex:1;min-width:180px;padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:14px;background:var(--surface);color:var(--text);outline:none}
-  .toolbar input[type="text"]:focus,.toolbar select:focus{border-color:var(--blue)}
+  .toolbar input:focus,.toolbar select:focus{border-color:var(--blue)}
   .toolbar select{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:14px;background:var(--surface);color:var(--text);outline:none;cursor:pointer}
   .btn{padding:9px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;white-space:nowrap}
   .btn:hover{opacity:.85}
   .btn-primary{background:var(--text);color:#fff}
   .btn-green{background:var(--green);color:#fff}
-  .btn-red{background:var(--red);color:#fff}
   .btn-purple{background:var(--purple);color:#fff}
   .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
   .btn-icon{padding:6px 10px;font-size:14px;border-radius:6px}
@@ -90,17 +81,16 @@
   input:focus,select:focus,textarea:focus{border-color:var(--blue)}
   textarea{resize:vertical;min-height:64px}
   .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
-  .profit-preview{background:var(--surface2);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:13px;color:var(--text2);margin-top:4px}
+  .profit-preview{background:var(--surface2);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:13px;color:var(--text2)}
   .profit-preview .pp-val{font-weight:600}
   .profit-preview .pp-val.pos{color:var(--green)}
   .profit-preview .pp-val.neg{color:var(--red)}
   .sell-info{background:var(--surface2);border-radius:10px;padding:14px 16px;margin-bottom:18px}
   .sell-info-name{font-weight:700;font-size:15px;margin-bottom:6px}
   .sell-info-row{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--text2)}
-  .sell-info-row span b{color:var(--text)}
-  .sell-preview{background:var(--purple-light);border:1px solid #ddd6fe;border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:13px;color:var(--purple);margin-top:4px}
+  .sell-preview{background:var(--purple-light);border:1px solid #ddd6fe;border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:13px;color:var(--purple)}
   .sell-preview b{font-weight:700}
-  .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
+  .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border)}
   .tab{padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
   .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
   .tab-panel{display:none}
@@ -110,16 +100,34 @@
   .log-name{font-weight:600;color:var(--text)}
   .log-meta{font-size:11px;color:var(--text3);margin-top:2px}
   .log-profit{font-family:var(--mono);font-weight:700;color:var(--purple)}
-  /* Install banner */
   .install-banner{background:#1a2332;color:#fff;padding:12px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;font-size:13px}
   .install-banner.show{display:flex}
-  .install-banner button{background:#4ade80;color:#1a2332;border:none;padding:7px 14px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px}
+  .install-banner button{background:#4ade80;color:#1a2332;border:none;padding:7px 14px;border-radius:8px;font-weight:700;cursor:pointer}
+
+  /* ── CHART ── */
+  .chart-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:20px}
+  .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+  .chart-title{font-size:15px;font-weight:700}
+  .chart-legend{display:flex;gap:16px;font-size:12px;color:var(--text2)}
+  .legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:5px;vertical-align:middle}
+  .chart-wrap{position:relative;width:100%;overflow-x:auto}
+  canvas#monthlyChart{display:block;max-width:100%}
+  .chart-empty{text-align:center;padding:40px;color:var(--text3);font-size:13px}
+  .chart-year-select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);color:var(--text);outline:none;cursor:pointer}
+  /* summary pills row */
+  .month-summary{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  .ms-pill{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;flex:1;min-width:120px}
+  .ms-pill-label{color:var(--text3);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+  .ms-pill-val{font-family:var(--mono);font-weight:700;font-size:15px}
+  .ms-pill-val.green{color:var(--green)}
+  .ms-pill-val.purple{color:var(--purple)}
+  .ms-pill-val.blue{color:var(--blue)}
+
   @media(max-width:500px){.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:1}.stats{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
 
-<!-- INSTALL BANNER -->
 <div class="install-banner" id="installBanner">
   <span>📲 Install MediStock as an app</span>
   <button onclick="installApp()">Install</button>
@@ -141,11 +149,16 @@
     <div class="stat-card"><div class="stat-label">Total Earned</div><div class="stat-value purple" id="statEarned">₹0</div></div>
     <div class="stat-card"><div class="stat-label">Low Stock</div><div class="stat-value amber" id="statLow">0</div></div>
   </div>
+
   <div class="alert-banner" id="alertBanner"><span>⚠️</span><span id="alertText"></span></div>
+
   <div class="tabs">
     <button class="tab active" onclick="switchTab('inventory')">📦 Inventory</button>
     <button class="tab" onclick="switchTab('sales')">💰 Sales Log</button>
+    <button class="tab" onclick="switchTab('analytics')">📊 Analytics</button>
   </div>
+
+  <!-- INVENTORY TAB -->
   <div class="tab-panel active" id="tab-inventory">
     <div class="toolbar">
       <input type="text" id="searchBox" placeholder="🔍 Search medicine, category..." oninput="renderTable()">
@@ -183,6 +196,8 @@
       </div>
     </div>
   </div>
+
+  <!-- SALES LOG TAB -->
   <div class="tab-panel" id="tab-sales">
     <div class="section-top">
       <div class="section-title">Sales History</div>
@@ -197,6 +212,41 @@
       </div>
     </div>
   </div>
+
+  <!-- ANALYTICS TAB -->
+  <div class="tab-panel" id="tab-analytics">
+
+    <!-- Current month summary -->
+    <div class="month-summary" id="monthSummary"></div>
+
+    <!-- Monthly chart -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">Monthly Revenue vs Profit</div>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+          <select class="chart-year-select" id="yearSelect" onchange="renderChart()"></select>
+          <div class="chart-legend">
+            <span><span class="legend-dot" style="background:#6d28d9"></span>Revenue</span>
+            <span><span class="legend-dot" style="background:#0d6e4f"></span>Profit</span>
+          </div>
+        </div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="monthlyChart" height="260"></canvas>
+      </div>
+      <div class="chart-empty" id="chartEmpty" style="display:none">
+        <div style="font-size:32px;margin-bottom:8px">📊</div>
+        <div>No sales data yet. Start recording sales to see your analytics.</div>
+      </div>
+    </div>
+
+    <!-- Top selling medicines -->
+    <div class="section-top" style="margin-top:8px">
+      <div class="section-title">Top Selling Medicines</div>
+    </div>
+    <div class="table-wrap" id="topSelling"></div>
+
+  </div>
 </main>
 
 <!-- ADD/EDIT MODAL -->
@@ -209,7 +259,7 @@
       <div class="form-group"><label>Quantity (units)</label><input type="number" id="fQty" min="0" placeholder="0"></div>
       <div class="form-group"><label>Purchase Cost (₹/unit)</label><input type="number" id="fPurchase" min="0" step="0.01" placeholder="0.00" oninput="updateProfitPreview()"></div>
       <div class="form-group"><label>Selling Price (₹/unit)</label><input type="number" id="fSelling" min="0" step="0.01" placeholder="0.00" oninput="updateProfitPreview()"></div>
-      <div class="form-group"><label>Low Stock Alert (units)</label><input type="number" id="fLowAlert" min="0" placeholder="10"></div>
+      <div class="form-group"><label>Low Stock Alert</label><input type="number" id="fLowAlert" min="0" placeholder="10"></div>
       <div class="form-group full"><label>Expiry Date</label><input type="text" id="fExpiry" placeholder="e.g. Dec 2026"></div>
       <div class="form-group full"><label>Notes</label><textarea id="fNotes" placeholder="Optional notes..."></textarea></div>
       <div class="form-group full"><div class="profit-preview" id="profitPreview">Enter purchase & selling price to see profit</div></div>
@@ -242,58 +292,36 @@
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script>
-  // ── DATA ──────────────────────────────────────────────────────────────────
   let inventory = JSON.parse(localStorage.getItem('medistock_v1')||'[]');
   let salesLog   = JSON.parse(localStorage.getItem('medistock_sales')||'[]');
   let editingId=null, sellingId=null, sortKey='name', sortAsc=true;
+  let chartInstance=null;
 
   function save(){
     localStorage.setItem('medistock_v1',JSON.stringify(inventory));
     localStorage.setItem('medistock_sales',JSON.stringify(salesLog));
   }
   function genId(){return Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+  function fmt(n){return '₹'+n.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});}
 
-  // ── PWA INSTALL ───────────────────────────────────────────────────────────
+  // ── PWA ───────────────────────────────────────────────────────────────────
   let deferredPrompt=null;
-  window.addEventListener('beforeinstallprompt',e=>{
-    e.preventDefault(); deferredPrompt=e;
-    document.getElementById('installBanner').classList.add('show');
-  });
-  function installApp(){
-    if(!deferredPrompt)return;
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(()=>{
-      deferredPrompt=null;
-      document.getElementById('installBanner').classList.remove('show');
-    });
-  }
-  window.addEventListener('appinstalled',()=>{
-    document.getElementById('installBanner').classList.remove('show');
-  });
-
-  // ── SERVICE WORKER ────────────────────────────────────────────────────────
-  if('serviceWorker' in navigator){
-    const swCode=`
-      const CACHE='medistock-v1';
-      const FILES=['./','/index.html'];
-      self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES))));
-      self.addEventListener('fetch',e=>e.respondWith(caches.match(e.request).then(r=>r||fetch(e.request))));
-    `;
-    const blob=new Blob([swCode],{type:'application/javascript'});
-    const swUrl=URL.createObjectURL(blob);
-    navigator.serviceWorker.register(swUrl).catch(()=>{});
-  }
+  window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPrompt=e;document.getElementById('installBanner').classList.add('show');});
+  function installApp(){if(!deferredPrompt)return;deferredPrompt.prompt();deferredPrompt.userChoice.then(()=>{deferredPrompt=null;document.getElementById('installBanner').classList.remove('show');});}
 
   // ── TABS ──────────────────────────────────────────────────────────────────
   function switchTab(name){
-    document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['inventory','sales'][i]===name));
+    const names=['inventory','sales','analytics'];
+    document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
     document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
     document.getElementById('tab-'+name).classList.add('active');
     if(name==='sales') renderSalesLog();
+    if(name==='analytics') renderAnalytics();
   }
 
-  // ── ADD/EDIT MODAL ────────────────────────────────────────────────────────
+  // ── ADD/EDIT ──────────────────────────────────────────────────────────────
   function openAddModal(id=null){
     editingId=id;
     document.getElementById('modalTitle').textContent=id?'Edit Medicine':'Add Medicine';
@@ -352,17 +380,16 @@
     save();renderAll();
   }
 
-  // ── SELL MODAL ────────────────────────────────────────────────────────────
+  // ── SELL ──────────────────────────────────────────────────────────────────
   function openSellModal(id){
     sellingId=id;
     const it=inventory.find(i=>i.id===id);
-    const profit=it.selling-it.purchase;
     document.getElementById('sellInfo').innerHTML=`
       <div class="sell-info-name">💊 ${it.name}</div>
       <div class="sell-info-row">
         <span>Stock: <b>${it.qty} units</b></span>
         <span>Selling: <b>₹${it.selling.toFixed(2)}</b></span>
-        <span>Profit/unit: <b style="color:var(--purple)">₹${profit.toFixed(2)}</b></span>
+        <span>Profit/unit: <b style="color:var(--purple)">₹${(it.selling-it.purchase).toFixed(2)}</b></span>
       </div>`;
     document.getElementById('sQty').value='';
     document.getElementById('sellPreview').innerHTML='Enter quantity to see sale summary';
@@ -390,7 +417,8 @@
     salesLog.unshift({
       id:genId(),medicineId:it.id,name:it.name,qty,revenue,profit,
       sellingPrice:it.selling,purchasePrice:it.purchase,
-      date:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+      date:new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}),
+      ts: Date.now()
     });
     save();closeModal('overlaySell');renderAll();
   }
@@ -404,7 +432,7 @@
       <div class="log-item">
         <div>
           <div class="log-name">💊 ${s.name}</div>
-          <div class="log-meta">${s.date} &nbsp;·&nbsp; ${s.qty} unit${s.qty>1?'s':''} × ₹${s.sellingPrice.toFixed(2)}</div>
+          <div class="log-meta">${s.date} · ${s.qty} unit${s.qty>1?'s':''} × ₹${s.sellingPrice.toFixed(2)}</div>
         </div>
         <div style="text-align:right">
           <div class="log-profit">+₹${s.profit.toFixed(2)}</div>
@@ -419,7 +447,150 @@
     salesLog=[];save();renderSalesLog();
   }
 
-  // ── MODALS UTILS ──────────────────────────────────────────────────────────
+  // ── ANALYTICS ─────────────────────────────────────────────────────────────
+  const MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+  function getYears(){
+    const yrs=new Set(salesLog.map(s=>new Date(s.ts||Date.now()).getFullYear()));
+    if(!yrs.size) yrs.add(new Date().getFullYear());
+    return [...yrs].sort((a,b)=>b-a);
+  }
+
+  function buildMonthlyData(year){
+    const revenue=Array(12).fill(0), profit=Array(12).fill(0);
+    salesLog.forEach(s=>{
+      const d=new Date(s.ts||Date.now());
+      if(d.getFullYear()===year){
+        revenue[d.getMonth()]+=s.revenue;
+        profit[d.getMonth()]+=s.profit;
+      }
+    });
+    return{revenue,profit};
+  }
+
+  function renderAnalytics(){
+    // populate year selector
+    const sel=document.getElementById('yearSelect');
+    const years=getYears();
+    const curVal=sel.value||String(new Date().getFullYear());
+    sel.innerHTML=years.map(y=>`<option value="${y}"${String(y)===curVal?' selected':''}>${y}</option>`).join('');
+
+    renderChart();
+    renderMonthSummary();
+    renderTopSelling();
+  }
+
+  function renderChart(){
+    const year=parseInt(document.getElementById('yearSelect').value)||new Date().getFullYear();
+    const {revenue,profit}=buildMonthlyData(year);
+    const hasData=revenue.some(v=>v>0);
+    const canvas=document.getElementById('monthlyChart');
+    const empty=document.getElementById('chartEmpty');
+
+    if(!hasData){
+      canvas.style.display='none';
+      empty.style.display='block';
+      if(chartInstance){chartInstance.destroy();chartInstance=null;}
+      return;
+    }
+    canvas.style.display='block';
+    empty.style.display='none';
+
+    if(chartInstance) chartInstance.destroy();
+
+    chartInstance=new Chart(canvas,{
+      type:'bar',
+      data:{
+        labels:MONTHS,
+        datasets:[
+          {
+            label:'Revenue',
+            data:revenue,
+            backgroundColor:'rgba(109,40,217,0.7)',
+            borderColor:'#6d28d9',
+            borderWidth:1,
+            borderRadius:4,
+            order:2
+          },
+          {
+            label:'Profit',
+            data:profit,
+            backgroundColor:'rgba(13,110,79,0.85)',
+            borderColor:'#0d6e4f',
+            borderWidth:1,
+            borderRadius:4,
+            order:1,
+            type:'line',
+            fill:false,
+            tension:0.3,
+            pointBackgroundColor:'#0d6e4f',
+            pointRadius:4,
+          }
+        ]
+      },
+      options:{
+        responsive:true,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            callbacks:{
+              label:ctx=>`${ctx.dataset.label}: ₹${ctx.parsed.y.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2})}`
+            }
+          }
+        },
+        scales:{
+          x:{grid:{display:false},ticks:{font:{size:11}}},
+          y:{
+            ticks:{
+              callback:v=>v>=1000?'₹'+(v/1000).toFixed(0)+'k':'₹'+v,
+              font:{size:11}
+            },
+            grid:{color:'#e8edf3'}
+          }
+        }
+      }
+    });
+  }
+
+  function renderMonthSummary(){
+    const now=new Date();
+    const thisMonth=salesLog.filter(s=>{
+      const d=new Date(s.ts||Date.now());
+      return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+    });
+    const mRevenue=thisMonth.reduce((a,s)=>a+s.revenue,0);
+    const mProfit=thisMonth.reduce((a,s)=>a+s.profit,0);
+    const mSales=thisMonth.length;
+    document.getElementById('monthSummary').innerHTML=`
+      <div class="ms-pill"><div class="ms-pill-label">This Month Sales</div><div class="ms-pill-val blue">${mSales}</div></div>
+      <div class="ms-pill"><div class="ms-pill-label">This Month Revenue</div><div class="ms-pill-val purple">${fmt(mRevenue)}</div></div>
+      <div class="ms-pill"><div class="ms-pill-label">This Month Profit</div><div class="ms-pill-val green">${fmt(mProfit)}</div></div>`;
+  }
+
+  function renderTopSelling(){
+    const totals={};
+    salesLog.forEach(s=>{
+      if(!totals[s.name]) totals[s.name]={name:s.name,qty:0,revenue:0,profit:0};
+      totals[s.name].qty+=s.qty;
+      totals[s.name].revenue+=s.revenue;
+      totals[s.name].profit+=s.profit;
+    });
+    const sorted=Object.values(totals).sort((a,b)=>b.revenue-a.revenue).slice(0,5);
+    const el=document.getElementById('topSelling');
+    if(!sorted.length){el.innerHTML=`<div class="empty" style="padding:32px"><div class="empty-icon">🏆</div><h3>No sales yet</h3></div>`;return;}
+    el.innerHTML=`<table style="min-width:400px"><thead><tr>
+      <th>#</th><th>Medicine</th><th>Units Sold</th><th>Revenue</th><th>Profit</th>
+    </tr></thead><tbody>${sorted.map((r,i)=>`<tr>
+      <td style="color:var(--text3);font-family:var(--mono)">${i+1}</td>
+      <td style="font-weight:600">${r.name}</td>
+      <td class="mono">${r.qty}</td>
+      <td class="profit-pos">${fmt(r.revenue)}</td>
+      <td class="profit-pos">${fmt(r.profit)}</td>
+    </tr>`).join('')}</tbody></table>`;
+  }
+
+  // ── MODALS ────────────────────────────────────────────────────────────────
   function closeModal(id){document.getElementById(id).classList.remove('open');}
   function handleOverlayClick(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 
@@ -464,7 +635,7 @@
       const[st,sc]=stockStatus(it);
       return`<tr>
         <td>
-          <div style="font-weight:600;color:var(--text)">${it.name}</div>
+          <div style="font-weight:600">${it.name}</div>
           ${it.expiry?`<div style="font-size:11px;color:var(--text3)">Exp: ${it.expiry}</div>`:''}
           ${it.notes?`<div style="font-size:11px;color:var(--text3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${it.notes}</div>`:''}
         </td>
@@ -475,9 +646,9 @@
         <td class="${pc}">₹${profit.toFixed(2)}</td>
         <td><span class="pill ${sc}">${st}</span></td>
         <td style="white-space:nowrap">
-          <button class="btn btn-purple btn-icon" onclick="openSellModal('${it.id}')" title="Sell">💊 Sell</button>
-          <button class="btn btn-ghost btn-icon" onclick="openAddModal('${it.id}')" title="Edit" style="margin-left:4px">✏️</button>
-          <button class="btn btn-ghost btn-icon" onclick="deleteItem('${it.id}')" title="Delete" style="margin-left:4px">🗑️</button>
+          <button class="btn btn-purple btn-icon" onclick="openSellModal('${it.id}')">💊 Sell</button>
+          <button class="btn btn-ghost btn-icon" onclick="openAddModal('${it.id}')" style="margin-left:4px">✏️</button>
+          <button class="btn btn-ghost btn-icon" onclick="deleteItem('${it.id}')" style="margin-left:4px">🗑️</button>
         </td>
       </tr>`;
     }).join('');
@@ -490,10 +661,10 @@
     const low=inventory.filter(i=>i.qty>0&&i.qty<=(i.lowAlert||10)).length;
     const out=inventory.filter(i=>i.qty===0).length;
     document.getElementById('statTotal').textContent=inventory.length;
-    document.getElementById('statValue').textContent='₹'+totalValue.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
-    document.getElementById('statProfit').textContent='₹'+totalProfit.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statValue').textContent=fmt(totalValue);
+    document.getElementById('statProfit').textContent=fmt(totalProfit);
     document.getElementById('statProfit').className='stat-value '+(totalProfit>=0?'green':'red');
-    document.getElementById('statEarned').textContent='₹'+totalEarned.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statEarned').textContent=fmt(totalEarned);
     document.getElementById('statLow').textContent=low+out;
     const banner=document.getElementById('alertBanner'),badge=document.getElementById('lowBadge');
     const parts=[];
@@ -519,39 +690,8 @@
     const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='medistock.csv';a.click();
   }
 
-  // ── FIRST LAUNCH CHECK (no seed data) ────────────────────────────────────
-  // Only show empty state on first ever load, never auto-fill demo data
-
   renderAll();
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('overlayAdd');closeModal('overlaySell');}});
-</script>
-
-<!-- INLINE MANIFEST for PWABuilder -->
-<script>
-  // Inject manifest dynamically so it works from a single HTML file
-  const manifest = {
-    name: "MediStock",
-    short_name: "MediStock",
-    description: "Smart pharmacy inventory and sales tracker",
-    start_url: "./",
-    display: "standalone",
-    background_color: "#f0f4f8",
-    theme_color: "#1a2332",
-    orientation: "portrait",
-    icons: [
-      {
-        src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='80' fill='%231a2332'/><text y='380' x='60' font-size='380'>💊</text></svg>",
-        sizes: "512x512",
-        type: "image/svg+xml",
-        purpose: "any maskable"
-      }
-    ]
-  };
-  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
-  const url  = URL.createObjectURL(blob);
-  const link = document.createElement('link');
-  link.rel='manifest'; link.href=url;
-  document.head.appendChild(link);
 </script>
 </body>
 </html>
