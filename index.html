@@ -5,425 +5,101 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MediStock — Pharmacy Inventory</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600;700&display=swap');
-  
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Inter:wght@300;400;500;600&display=swap');
   :root {
-    /* Modern Medical Palette */
-    --bg: #f4f7f6;
-    --surface: #ffffff;
-    --surface2: #f8fafc;
-    --border: #e2e8f0;
-    --text: #0f172a;
-    --text2: #475569;
-    --text3: #94a3b8;
-    
-    --primary: #0f766e; /* Deep Teal */
-    --primary-hover: #115e59;
-    --primary-light: #ccfbf1;
-    
-    --green: #16a34a; 
-    --green-light: #dcfce7;
-    --red: #ef4444; 
-    --red-light: #fee2e2;
-    --amber: #f59e0b; 
-    --amber-light: #fef3c7;
-    --purple: #6366f1; /* Indigo */
-    --purple-light: #e0e7ff;
-    
-    --mono: 'IBM Plex Mono', monospace;
-    --sans: 'Inter', sans-serif;
-    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --bg:#f0f4f8;--surface:#fff;--surface2:#e8edf3;--border:#d0d9e4;
+    --text:#1a2332;--text2:#4a5568;--text3:#8a9bb0;
+    --green:#0d6e4f;--green-light:#e6f4ef;
+    --red:#c0392b;--red-light:#fdf0ee;
+    --amber:#b45309;--amber-light:#fef3c7;
+    --blue:#1d4ed8;--blue-light:#eff6ff;
+    --purple:#6d28d9;--purple-light:#f5f3ff;
+    --mono:'IBM Plex Mono',monospace;--sans:'Inter',sans-serif;
   }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  
-  body { 
-    font-family: var(--sans); 
-    background: var(--bg); 
-    color: var(--text); 
-    min-height: 100vh; 
-    font-size: 14px;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* Header with Glassmorphism */
-  header {
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 64px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .logo {
-    font-family: var(--sans);
-    font-weight: 700;
-    font-size: 18px;
-    letter-spacing: -0.5px;
-    color: var(--text);
-  }
-
-  .logo span { color: var(--primary); }
-
-  .header-right { display: flex; align-items: center; gap: 12px; }
-
-  .badge-low {
-    background: var(--red-light);
-    color: var(--red);
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 20px;
-    display: none;
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.6; }
-    100% { opacity: 1; }
-  }
-
-  main { max-width: 1200px; margin: 0 auto; padding: 32px 16px; }
-
-  /* Stats Grid */
-  .stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-bottom: 24px;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: var(--shadow-sm);
-    transition: transform 0.2s, box-shadow 0.2s;
-  }
-
-  .stat-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .stat-label {
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text3);
-    margin-bottom: 8px;
-  }
-
-  .stat-value { font-family: var(--mono); font-size: 26px; font-weight: 600; }
-  .stat-value.green { color: var(--primary); }
-  .stat-value.red { color: var(--red); }
-  .stat-value.amber { color: var(--amber); }
-  .stat-value.purple { color: var(--purple); }
-
-  /* Alerts */
-  .alert-banner {
-    background: var(--amber-light);
-    border: 1px solid #fcd34d;
-    border-radius: 10px;
-    padding: 14px 18px;
-    margin-bottom: 20px;
-    font-size: 14px;
-    color: #92400e;
-    font-weight: 500;
-    display: none;
-    align-items: center;
-    gap: 10px;
-    box-shadow: var(--shadow-sm);
-  }
-  .alert-banner.show { display: flex; }
-
-  /* Controls */
-  .toolbar {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-
-  .toolbar input[type="text"], .toolbar select {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 14px;
-    background: var(--surface);
-    color: var(--text);
-    outline: none;
-    transition: all 0.2s;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .toolbar input[type="text"] { flex: 1; min-width: 200px; }
-  
-  .toolbar input[type="text"]:focus, .toolbar select:focus,
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px var(--primary-light);
-  }
-
-  /* Buttons */
-  .btn {
-    padding: 10px 18px;
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .btn:hover { transform: translateY(-1px); }
-  .btn:active { transform: translateY(0); }
-
-  .btn-primary { background: var(--primary); color: #fff; box-shadow: var(--shadow-sm); }
-  .btn-primary:hover { background: var(--primary-hover); box-shadow: var(--shadow-md); }
-  
-  .btn-green { background: var(--green); color: #fff; }
-  .btn-red { background: var(--red); color: #fff; }
-  .btn-purple { background: var(--purple); color: #fff; }
-  
-  .btn-ghost {
-    background: var(--surface);
-    color: var(--text2);
-    border: 1px solid var(--border);
-    box-shadow: var(--shadow-sm);
-  }
-  .btn-ghost:hover { background: var(--surface2); color: var(--text); }
-
-  .btn-icon { padding: 8px 12px; font-size: 14px; border-radius: 6px; }
-
-  /* Tables */
-  .section-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 8px; }
-  .section-title { font-size: 18px; font-weight: 700; color: var(--text); }
-  .item-count { font-size: 13px; color: var(--text3); font-family: var(--mono); background: var(--surface2); padding: 4px 10px; border-radius: 20px; }
-
-  .table-wrap {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    overflow-x: auto;
-    box-shadow: var(--shadow-sm);
-  }
-
-  table { width: 100%; border-collapse: collapse; min-width: 800px; }
-  thead tr { background: var(--surface2); border-bottom: 1px solid var(--border); }
-  
-  th {
-    padding: 14px 16px;
-    text-align: left;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    color: var(--text2);
-    cursor: pointer;
-    user-select: none;
-    white-space: nowrap;
-    transition: background 0.2s;
-  }
-  th:hover { background: var(--border); color: var(--text); }
-  
-  td { padding: 14px 16px; border-bottom: 1px solid var(--border); vertical-align: middle; }
-  tbody tr { transition: background 0.15s; }
-  tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: #f8fafc; }
-
-  /* Pills */
-  .pill {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-  .pill-green { background: var(--green-light); color: var(--green); }
-  .pill-red { background: var(--red-light); color: var(--red); }
-  .pill-amber { background: var(--amber-light); color: #b45309; }
-
-  .mono { font-family: var(--mono); font-size: 14px; }
-  .profit-pos { color: var(--green); font-weight: 600; font-family: var(--mono); font-size: 14px; }
-  .profit-neg { color: var(--red); font-weight: 600; font-family: var(--mono); font-size: 14px; }
-
-  /* Empty States */
-  .empty { text-align: center; padding: 64px 24px; color: var(--text3); }
-  .empty-icon { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-  .empty h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
-
-  /* Modals */
-  .overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(4px);
-    z-index: 200;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    opacity: 0;
-    transition: opacity 0.2s ease;
-  }
-  .overlay.open { display: flex; opacity: 1; }
-  
-  .modal {
-    background: var(--surface);
-    border-radius: 16px;
-    width: 100%;
-    max-width: 550px;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 32px;
-    box-shadow: var(--shadow-lg);
-    transform: translateY(20px);
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  }
-  .overlay.open .modal { transform: translateY(0); }
-  
-  .modal h2 { font-size: 22px; font-weight: 700; margin-bottom: 24px; color: var(--text); }
-  
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-group.full { grid-column: 1 / -1; }
-  
-  label { font-size: 12px; font-weight: 600; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
-  
-  input[type="text"], input[type="number"], select, textarea {
-    padding: 10px 14px;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    font-family: var(--sans);
-    font-size: 14px;
-    color: var(--text);
-    background: var(--surface);
-    outline: none;
-    transition: all 0.2s;
-  }
-  textarea { resize: vertical; min-height: 80px; }
-  
-  .modal-actions {
-    display: flex;
-    gap: 12px;
-    justify-content: flex-end;
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border);
-  }
-  
-  .profit-preview {
-    background: var(--surface2);
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-family: var(--mono);
-    font-size: 13px;
-    color: var(--text2);
-    margin-top: 4px;
-    border: 1px dashed var(--border);
-  }
-  .profit-preview .pp-val { font-weight: 600; }
-  .profit-preview .pp-val.pos { color: var(--green); }
-  .profit-preview .pp-val.neg { color: var(--red); }
-
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;font-size:14px}
+  header{background:var(--text);color:#fff;padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100}
+  .logo{font-family:var(--mono);font-weight:600;font-size:16px;letter-spacing:-.5px}
+  .logo span{color:#4ade80}
+  .header-right{display:flex;align-items:center;gap:10px}
+  .badge-low{background:#c0392b;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px;display:none}
+  main{max-width:1150px;margin:0 auto;padding:24px 16px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:20px}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px 18px}
+  .stat-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--text3);margin-bottom:6px}
+  .stat-value{font-family:var(--mono);font-size:22px;font-weight:600}
+  .stat-value.green{color:var(--green)}.stat-value.red{color:var(--red)}.stat-value.amber{color:var(--amber)}.stat-value.purple{color:var(--purple)}
+  .alert-banner{background:var(--amber-light);border:1px solid #fbbf24;border-radius:10px;padding:12px 16px;margin-bottom:16px;font-size:13px;color:var(--amber);font-weight:500;display:none;align-items:center;gap:8px}
+  .alert-banner.show{display:flex}
+  .toolbar{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+  .toolbar input[type="text"]{flex:1;min-width:180px;padding:9px 14px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:14px;background:var(--surface);color:var(--text);outline:none}
+  .toolbar input[type="text"]:focus,.toolbar select:focus{border-color:var(--blue)}
+  .toolbar select{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:14px;background:var(--surface);color:var(--text);outline:none;cursor:pointer}
+  .btn{padding:9px 16px;border-radius:8px;font-family:var(--sans);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;white-space:nowrap}
+  .btn:hover{opacity:.85}
+  .btn-primary{background:var(--text);color:#fff}
+  .btn-green{background:var(--green);color:#fff}
+  .btn-red{background:var(--red);color:#fff}
+  .btn-purple{background:var(--purple);color:#fff}
+  .btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border)}
+  .btn-icon{padding:6px 10px;font-size:14px;border-radius:6px}
+  .section-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+  .section-title{font-size:15px;font-weight:700}
+  .item-count{font-size:12px;color:var(--text3);font-family:var(--mono)}
+  .table-wrap{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:750px}
+  thead tr{background:var(--surface2);border-bottom:1px solid var(--border)}
+  th{padding:10px 14px;text-align:left;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--text3);cursor:pointer;user-select:none;white-space:nowrap}
+  th:hover{color:var(--text)}
+  td{padding:11px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:#f8fafc}
+  .pill{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+  .pill-green{background:var(--green-light);color:var(--green)}
+  .pill-red{background:var(--red-light);color:var(--red)}
+  .pill-amber{background:var(--amber-light);color:var(--amber)}
+  .mono{font-family:var(--mono);font-size:13px}
+  .profit-pos{color:var(--green);font-weight:600;font-family:var(--mono);font-size:13px}
+  .profit-neg{color:var(--red);font-weight:600;font-family:var(--mono);font-size:13px}
+  .empty{text-align:center;padding:48px 24px;color:var(--text3)}
+  .empty-icon{font-size:40px;margin-bottom:12px}
+  .empty h3{font-size:16px;color:var(--text2);margin-bottom:6px}
+  /* MODAL */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:center;justify-content:center;padding:16px}
+  .overlay.open{display:flex}
+  .modal{background:var(--surface);border-radius:14px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;padding:28px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+  .modal h2{font-size:18px;font-weight:700;margin-bottom:20px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .form-group{display:flex;flex-direction:column;gap:5px}
+  .form-group.full{grid-column:1/-1}
+  label{font-size:12px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.5px}
+  input[type="text"],input[type="number"],select,textarea{padding:9px 12px;border:1px solid var(--border);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--text);background:var(--surface);outline:none;transition:border-color .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--blue)}
+  textarea{resize:vertical;min-height:64px}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+  .profit-preview{background:var(--surface2);border-radius:8px;padding:10px 14px;font-family:var(--mono);font-size:13px;color:var(--text2);margin-top:4px}
+  .profit-preview .pp-val{font-weight:600}
+  .profit-preview .pp-val.pos{color:var(--green)}
+  .profit-preview .pp-val.neg{color:var(--red)}
   /* SELL MODAL specifics */
-  .sell-info {
-    background: var(--primary-light);
-    border: 1px solid #99f6e4;
-    border-radius: 10px;
-    padding: 16px;
-    margin-bottom: 24px;
-  }
-  .sell-info-name { font-weight: 700; font-size: 18px; margin-bottom: 8px; color: var(--primary-hover); }
-  .sell-info-row { display: flex; gap: 24px; flex-wrap: wrap; font-size: 14px; color: var(--primary-hover); }
-  .sell-info-row span b { color: var(--primary-hover); font-family: var(--mono); font-size: 15px;}
-  
-  .sell-preview {
-    background: var(--purple-light);
-    border: 1px solid #c7d2fe;
-    border-radius: 8px;
-    padding: 14px 16px;
-    font-family: var(--mono);
-    font-size: 14px;
-    color: var(--purple);
-    margin-top: 4px;
-  }
-  .sell-preview b { font-weight: 700; color: #4338ca; }
-
+  .sell-info{background:var(--surface2);border-radius:10px;padding:14px 16px;margin-bottom:18px}
+  .sell-info-name{font-weight:700;font-size:15px;margin-bottom:6px}
+  .sell-info-row{display:flex;gap:20px;flex-wrap:wrap;font-size:13px;color:var(--text2)}
+  .sell-info-row span b{color:var(--text)}
+  .sell-preview{background:var(--purple-light);border:1px solid #ddd6fe;border-radius:8px;padding:12px 14px;font-family:var(--mono);font-size:13px;color:var(--purple);margin-top:4px}
+  .sell-preview b{font-weight:700}
   /* SALES LOG */
-  .tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    border-bottom: 2px solid var(--border);
-    padding-bottom: 0;
-  }
-  .tab {
-    padding: 12px 20px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    background: none;
-    color: var(--text3);
-    border-bottom: 2px solid transparent;
-    margin-bottom: -2px;
-    transition: all 0.2s;
-  }
-  .tab:hover { color: var(--text2); }
-  .tab.active { color: var(--primary); border-bottom-color: var(--primary); }
-  
-  .tab-panel { display: none; animation: fadeIn 0.3s ease; }
-  .tab-panel.active { display: block; }
-  
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-
-  .log-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
-    transition: background 0.2s;
-  }
-  .log-item:hover { background: #f8fafc; }
-  .log-item:last-child { border-bottom: none; }
-  
-  .log-name { font-weight: 600; color: var(--text); font-size: 15px; margin-bottom: 4px; }
-  .log-meta { font-size: 12px; color: var(--text3); font-family: var(--mono); }
-  .log-profit { font-family: var(--mono); font-weight: 700; font-size: 16px; color: var(--primary); }
-
-  @media(max-width: 600px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .form-group.full { grid-column: 1; }
-    .stats { grid-template-columns: 1fr 1fr; }
-    .toolbar { flex-direction: column; align-items: stretch; }
-    .toolbar input[type="text"] { min-width: 100%; }
-  }
+  .tabs{display:flex;gap:4px;margin-bottom:16px;border-bottom:2px solid var(--border);padding-bottom:0}
+  .tab{padding:8px 16px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:none;color:var(--text3);border-bottom:2px solid transparent;margin-bottom:-2px;transition:color .15s}
+  .tab.active{color:var(--purple);border-bottom-color:var(--purple)}
+  .tab-panel{display:none}
+  .tab-panel.active{display:block}
+  .log-item{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);font-size:13px}
+  .log-item:last-child{border-bottom:none}
+  .log-name{font-weight:600;color:var(--text)}
+  .log-meta{font-size:11px;color:var(--text3);margin-top:2px}
+  .log-profit{font-family:var(--mono);font-weight:700;color:var(--purple)}
+  @media(max-width:500px){.form-grid{grid-template-columns:1fr}.form-group.full{grid-column:1}.stats{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
@@ -442,16 +118,18 @@
     <div class="stat-card"><div class="stat-label">Stock Value</div><div class="stat-value green" id="statValue">₹0</div></div>
     <div class="stat-card"><div class="stat-label">Expected Profit</div><div class="stat-value green" id="statProfit">₹0</div></div>
     <div class="stat-card"><div class="stat-label">Total Earned</div><div class="stat-value purple" id="statEarned">₹0</div></div>
-    <div class="stat-card"><div class="stat-label">Low Stock Alerts</div><div class="stat-value amber" id="statLow">0</div></div>
+    <div class="stat-card"><div class="stat-label">Low Stock</div><div class="stat-value amber" id="statLow">0</div></div>
   </div>
 
   <div class="alert-banner" id="alertBanner"><span>⚠️</span><span id="alertText"></span></div>
 
+  <!-- TABS -->
   <div class="tabs">
     <button class="tab active" onclick="switchTab('inventory')">📦 Inventory</button>
     <button class="tab" onclick="switchTab('sales')">💰 Sales Log</button>
   </div>
 
+  <!-- INVENTORY TAB -->
   <div class="tab-panel active" id="tab-inventory">
     <div class="toolbar">
       <input type="text" id="searchBox" placeholder="🔍 Search medicine, category..." oninput="renderTable()">
@@ -462,10 +140,10 @@
         <option value="out">Out of Stock</option>
         <option value="ok">In Stock</option>
       </select>
-      <button class="btn btn-ghost" onclick="exportCSV()">⬇ Export CSV</button>
+      <button class="btn btn-ghost" onclick="exportCSV()">⬇ Export</button>
     </div>
     <div class="section-top">
-      <div class="section-title">Inventory Directory</div>
+      <div class="section-title">Inventory</div>
       <div class="item-count" id="itemCount">0 items</div>
     </div>
     <div class="table-wrap">
@@ -487,27 +165,29 @@
       <div class="empty" id="emptyState" style="display:none">
         <div class="empty-icon">💊</div>
         <h3>No medicines found</h3>
-        <p>Add your first product using the button in the top right.</p>
+        <p>Add your first product using the button above.</p>
       </div>
     </div>
   </div>
 
+  <!-- SALES LOG TAB -->
   <div class="tab-panel" id="tab-sales">
     <div class="section-top">
       <div class="section-title">Sales History</div>
-      <button class="btn btn-ghost btn-icon" onclick="clearSales()" style="font-size:12px;padding:8px 14px">🗑 Clear Log</button>
+      <button class="btn btn-ghost btn-icon" onclick="clearSales()" style="font-size:12px;padding:6px 12px">🗑 Clear Log</button>
     </div>
     <div class="table-wrap">
       <div id="salesLog"></div>
       <div class="empty" id="salesEmpty" style="display:none">
         <div class="empty-icon">🧾</div>
         <h3>No sales yet</h3>
-        <p>Record a sale using the 💊 Sell button on any medicine in your inventory.</p>
+        <p>Record a sale using the 💊 Sell button on any medicine.</p>
       </div>
     </div>
   </div>
 </main>
 
+<!-- ADD/EDIT MODAL -->
 <div class="overlay" id="overlayAdd" onclick="handleOverlayClick(event,'overlayAdd')">
   <div class="modal">
     <h2 id="modalTitle">Add Medicine</h2>
@@ -524,11 +204,12 @@
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="closeModal('overlayAdd')">Cancel</button>
-      <button class="btn btn-primary" id="saveBtn" onclick="saveItem()">Save Medicine</button>
+      <button class="btn btn-green" id="saveBtn" onclick="saveItem()">Save Medicine</button>
     </div>
   </div>
 </div>
 
+<!-- SELL MODAL -->
 <div class="overlay" id="overlaySell" onclick="handleOverlayClick(event,'overlaySell')">
   <div class="modal">
     <h2>Record Sale</h2>
@@ -550,10 +231,7 @@
 </div>
 
 <script>
-  // BUG FIX: Check if the key exists at all, instead of just checking if the array is empty.
-  const isFirstRun = localStorage.getItem('medistock_v1') === null;
-  
-  let inventory  = JSON.parse(localStorage.getItem('medistock_v1') || '[]');
+  let inventory = JSON.parse(localStorage.getItem('medistock_v1') || '[]');
   let salesLog   = JSON.parse(localStorage.getItem('medistock_sales') || '[]');
   let editingId  = null;
   let sellingId  = null;
@@ -585,4 +263,249 @@
       document.getElementById('fQty').value      = it.qty;
       document.getElementById('fPurchase').value = it.purchase;
       document.getElementById('fSelling').value  = it.selling;
-      document.getElementB
+      document.getElementById('fLowAlert').value = it.lowAlert||10;
+      document.getElementById('fExpiry').value   = it.expiry||'';
+      document.getElementById('fNotes').value    = it.notes||'';
+    } else {
+      ['fName','fCategory','fQty','fPurchase','fSelling','fExpiry','fNotes'].forEach(x=>document.getElementById(x).value='');
+      document.getElementById('fLowAlert').value = 10;
+    }
+    updateProfitPreview();
+    document.getElementById('overlayAdd').classList.add('open');
+    document.getElementById('fName').focus();
+  }
+
+  function updateProfitPreview() {
+    const p = parseFloat(document.getElementById('fPurchase').value)||0;
+    const s = parseFloat(document.getElementById('fSelling').value)||0;
+    const profit = s-p, margin = p>0?((profit/p)*100).toFixed(1):'--';
+    const el = document.getElementById('profitPreview');
+    if (!p&&!s){el.textContent='Enter purchase & selling price to see profit';return;}
+    const c = profit>=0?'pos':'neg';
+    el.innerHTML=`Profit/unit: <span class="pp-val ${c}">₹${profit.toFixed(2)}</span> &nbsp;|&nbsp; Margin: <span class="pp-val ${c}">${margin}%</span>`;
+  }
+
+  function saveItem() {
+    const name = document.getElementById('fName').value.trim();
+    if (!name){alert('Medicine name is required.');return;}
+    const item = {
+      id: editingId||genId(), name,
+      category: document.getElementById('fCategory').value.trim(),
+      qty: parseInt(document.getElementById('fQty').value)||0,
+      purchase: parseFloat(document.getElementById('fPurchase').value)||0,
+      selling:  parseFloat(document.getElementById('fSelling').value)||0,
+      lowAlert: parseInt(document.getElementById('fLowAlert').value)||10,
+      expiry:   document.getElementById('fExpiry').value.trim(),
+      notes:    document.getElementById('fNotes').value.trim(),
+    };
+    if (editingId) { const idx=inventory.findIndex(i=>i.id===editingId); inventory[idx]=item; }
+    else inventory.push(item);
+    save(); closeModal('overlayAdd'); renderAll();
+  }
+
+  function deleteItem(id) {
+    const it = inventory.find(i=>i.id===id);
+    if (!confirm(`Delete "${it.name}"?`)) return;
+    inventory = inventory.filter(i=>i.id!==id);
+    save(); renderAll();
+  }
+
+  // ── SELL MODAL ────────────────────────────────────────────────────────────
+  function openSellModal(id) {
+    sellingId = id;
+    const it = inventory.find(i=>i.id===id);
+    const profit = it.selling - it.purchase;
+    document.getElementById('sellInfo').innerHTML = `
+      <div class="sell-info-name">💊 ${it.name}</div>
+      <div class="sell-info-row">
+        <span>Stock: <b>${it.qty} units</b></span>
+        <span>Selling: <b>₹${it.selling.toFixed(2)}</b></span>
+        <span>Profit/unit: <b style="color:var(--purple)">₹${profit.toFixed(2)}</b></span>
+      </div>`;
+    document.getElementById('sQty').value = '';
+    document.getElementById('sellPreview').innerHTML = 'Enter quantity to see sale summary';
+    document.getElementById('overlaySell').classList.add('open');
+    document.getElementById('sQty').focus();
+  }
+
+  function updateSellPreview() {
+    const it  = inventory.find(i=>i.id===sellingId);
+    const qty = parseInt(document.getElementById('sQty').value)||0;
+    const el  = document.getElementById('sellPreview');
+    if (!qty){el.innerHTML='Enter quantity to see sale summary';return;}
+    if (qty > it.qty){
+      el.innerHTML=`<span style="color:var(--red)">⚠ Only ${it.qty} units in stock!</span>`;return;
+    }
+    const revenue = qty * it.selling;
+    const profit  = qty * (it.selling - it.purchase);
+    el.innerHTML=`Sell <b>${qty}</b> units → Revenue: <b>₹${revenue.toFixed(2)}</b> · Profit: <b>₹${profit.toFixed(2)}</b>`;
+  }
+
+  function confirmSale() {
+    const it  = inventory.find(i=>i.id===sellingId);
+    const qty = parseInt(document.getElementById('sQty').value)||0;
+    if (!qty){alert('Enter quantity sold.');return;}
+    if (qty > it.qty){alert(`Only ${it.qty} units available.`);return;}
+    const revenue = qty * it.selling;
+    const profit  = qty * (it.selling - it.purchase);
+    // update stock
+    it.qty -= qty;
+    // log sale
+    salesLog.unshift({
+      id: genId(), medicineId: it.id, name: it.name,
+      qty, revenue, profit,
+      sellingPrice: it.selling, purchasePrice: it.purchase,
+      date: new Date().toLocaleString('en-IN',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})
+    });
+    save(); closeModal('overlaySell'); renderAll();
+  }
+
+  // ── SALES LOG ─────────────────────────────────────────────────────────────
+  function renderSalesLog() {
+    const el = document.getElementById('salesLog');
+    const em = document.getElementById('salesEmpty');
+    if (!salesLog.length){el.innerHTML='';em.style.display='block';return;}
+    em.style.display='none';
+    el.innerHTML = salesLog.map(s=>`
+      <div class="log-item">
+        <div>
+          <div class="log-name">💊 ${s.name}</div>
+          <div class="log-meta">${s.date} &nbsp;·&nbsp; ${s.qty} unit${s.qty>1?'s':''} × ₹${s.sellingPrice.toFixed(2)}</div>
+        </div>
+        <div style="text-align:right">
+          <div class="log-profit">+₹${s.profit.toFixed(2)}</div>
+          <div style="font-size:11px;color:var(--text3)">Revenue ₹${s.revenue.toFixed(2)}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  function clearSales() {
+    if (!salesLog.length) return;
+    if (!confirm('Clear all sales history?')) return;
+    salesLog = []; save(); renderSalesLog();
+  }
+
+  // ── MODALS UTILS ──────────────────────────────────────────────────────────
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  function handleOverlayClick(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
+
+  // ── TABLE ─────────────────────────────────────────────────────────────────
+  function sortBy(key){ if(sortKey===key) sortAsc=!sortAsc; else{sortKey=key;sortAsc=true;} renderTable(); }
+
+  function getFiltered() {
+    const q = document.getElementById('searchBox').value.toLowerCase();
+    const cat = document.getElementById('filterCat').value;
+    const stock = document.getElementById('filterStock').value;
+    return inventory.filter(it=>{
+      const mq = !q || it.name.toLowerCase().includes(q)||(it.category||'').toLowerCase().includes(q);
+      const mc = !cat || it.category===cat;
+      const ms = !stock ||
+        (stock==='low'&&it.qty>0&&it.qty<=(it.lowAlert||10))||
+        (stock==='out'&&it.qty===0)||
+        (stock==='ok'&&it.qty>(it.lowAlert||10));
+      return mq&&mc&&ms;
+    }).sort((a,b)=>{
+      let va,vb;
+      if(sortKey==='name'){va=a.name.toLowerCase();vb=b.name.toLowerCase();}
+      else if(sortKey==='category'){va=(a.category||'').toLowerCase();vb=(b.category||'').toLowerCase();}
+      else if(sortKey==='qty'){va=a.qty;vb=b.qty;}
+      else if(sortKey==='purchase'){va=a.purchase;vb=b.purchase;}
+      else if(sortKey==='selling'){va=a.selling;vb=b.selling;}
+      else if(sortKey==='profit'){va=a.selling-a.purchase;vb=b.selling-b.purchase;}
+      return (va<vb?-1:va>vb?1:0)*(sortAsc?1:-1);
+    });
+  }
+
+  function stockStatus(it){
+    if(it.qty===0) return['Out of Stock','pill-red'];
+    if(it.qty<=(it.lowAlert||10)) return['Low Stock','pill-amber'];
+    return['In Stock','pill-green'];
+  }
+
+  function renderTable() {
+    const filtered = getFiltered();
+    const tbody = document.getElementById('tableBody');
+    const empty = document.getElementById('emptyState');
+    document.getElementById('itemCount').textContent=`${filtered.length} item${filtered.length!==1?'s':''}`;
+    if(!filtered.length){tbody.innerHTML='';empty.style.display='block';return;}
+    empty.style.display='none';
+    tbody.innerHTML = filtered.map(it=>{
+      const profit = it.selling-it.purchase;
+      const pc = profit>=0?'profit-pos':'profit-neg';
+      const [st,sc] = stockStatus(it);
+      return `<tr>
+        <td>
+          <div style="font-weight:600;color:var(--text)">${it.name}</div>
+          ${it.expiry?`<div style="font-size:11px;color:var(--text3)">Exp: ${it.expiry}</div>`:''}
+          ${it.notes?`<div style="font-size:11px;color:var(--text3);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${it.notes}</div>`:''}
+        </td>
+        <td style="color:var(--text2)">${it.category||'—'}</td>
+        <td class="mono">${it.qty}</td>
+        <td class="mono">₹${it.purchase.toFixed(2)}</td>
+        <td class="mono">₹${it.selling.toFixed(2)}</td>
+        <td class="${pc}">₹${profit.toFixed(2)}</td>
+        <td><span class="pill ${sc}">${st}</span></td>
+        <td style="white-space:nowrap">
+          <button class="btn btn-purple btn-icon" onclick="openSellModal('${it.id}')" title="Record Sale">💊 Sell</button>
+          <button class="btn btn-ghost btn-icon" onclick="openAddModal('${it.id}')" title="Edit" style="margin-left:4px">✏️</button>
+          <button class="btn btn-ghost btn-icon" onclick="deleteItem('${it.id}')" title="Delete" style="margin-left:4px">🗑️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  // ── STATS ─────────────────────────────────────────────────────────────────
+  function renderStats() {
+    const totalValue  = inventory.reduce((s,i)=>s+i.purchase*i.qty,0);
+    const totalProfit = inventory.reduce((s,i)=>s+(i.selling-i.purchase)*i.qty,0);
+    const totalEarned = salesLog.reduce((s,l)=>s+l.profit,0);
+    const low = inventory.filter(i=>i.qty>0&&i.qty<=(i.lowAlert||10)).length;
+    const out = inventory.filter(i=>i.qty===0).length;
+    document.getElementById('statTotal').textContent  = inventory.length;
+    document.getElementById('statValue').textContent  = '₹'+totalValue.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statProfit').textContent = '₹'+totalProfit.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statProfit').className   = 'stat-value '+(totalProfit>=0?'green':'red');
+    document.getElementById('statEarned').textContent = '₹'+totalEarned.toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+    document.getElementById('statLow').textContent    = low+out;
+    const banner = document.getElementById('alertBanner');
+    const badge  = document.getElementById('lowBadge');
+    const parts  = [];
+    if(out)  parts.push(`${out} out of stock`);
+    if(low)  parts.push(`${low} running low`);
+    if(parts.length){document.getElementById('alertText').textContent=parts.join(' · ')+'. Restock soon.';banner.classList.add('show');badge.style.display='inline';}
+    else{banner.classList.remove('show');badge.style.display='none';}
+  }
+
+  function renderCategories() {
+    const cats=[...new Set(inventory.map(i=>i.category).filter(Boolean))].sort();
+    const sel=document.getElementById('filterCat'),cur=sel.value;
+    sel.innerHTML='<option value="">All Categories</option>'+cats.map(c=>`<option value="${c}"${c===cur?' selected':''}>${c}</option>`).join('');
+    document.getElementById('catList').innerHTML=cats.map(c=>`<option value="${c}">`).join('');
+  }
+
+  function renderAll(){ renderStats(); renderCategories(); renderTable(); }
+
+  // ── EXPORT ────────────────────────────────────────────────────────────────
+  function exportCSV() {
+    const h=['Name','Category','Qty','Purchase','Selling','Profit/Unit','Status','Expiry'];
+    const rows=inventory.map(i=>{const[s]=stockStatus(i);return[i.name,i.category||'',i.qty,i.purchase,i.selling,(i.selling-i.purchase).toFixed(2),s,i.expiry||''];});
+    const csv=[h,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+    const a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='medistock.csv';a.click();
+  }
+
+  // ── SEED ──────────────────────────────────────────────────────────────────
+  if(!inventory.length){
+    inventory=[
+      {id:genId(),name:'Paracetamol 500mg',category:'Analgesic',qty:120,purchase:1.50,selling:2.50,lowAlert:20,expiry:'Mar 2027',notes:''},
+      {id:genId(),name:'Amoxicillin 250mg',category:'Antibiotic',qty:8,purchase:6.00,selling:10.00,lowAlert:15,expiry:'Jan 2027',notes:''},
+      {id:genId(),name:'ORS Sachet',category:'OTC',qty:0,purchase:3.00,selling:5.00,lowAlert:10,expiry:'Dec 2026',notes:'Reorder pending'},
+      {id:genId(),name:'Cetrizine 10mg',category:'Antihistamine',qty:60,purchase:2.00,selling:3.50,lowAlert:10,expiry:'Jun 2027',notes:''},
+    ];
+    save();
+  }
+
+  renderAll();
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('overlayAdd');closeModal('overlaySell');}});
+</script>
+</body>
+</html>
