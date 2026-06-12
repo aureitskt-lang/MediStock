@@ -687,18 +687,17 @@
   renderAll();
   document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeModal('overlayAdd');closeModal('overlaySell');}});
 </script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').then(reg => {
-        console.log('Service Worker Registered!', reg);
-      }).catch(err => {
-        console.log('Service Worker Failed!', err);
-      });
+ <script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+        navigator.serviceWorker.register('./service-worker.js')
+            .then(function(registration) {
+                console.log('Service Worker registered:', registration);
+            })
+            .catch(function(error) {
+                console.log('Service Worker registration failed:', error);
+            });
     });
-  }
-</script>
+}
 </body>
 </html>
-
-```
